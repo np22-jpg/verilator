@@ -1,0 +1,92 @@
+diff --git a/src/V3Tristate.cpp b/src/V3Tristate.cpp
+index eab63c2..b5dca8b 100644
+--- a/src/V3Tristate.cpp
++++ b/src/V3Tristate.cpp
+@@ -344,14 +344,15 @@ private:
+ 		}
+ 	    }
+ 	    if (!complete) {
+-		if (found_one) {
+-		    UINFO(9, "       Problem mixing tristate and low-Z on " << lhsp << endl);
+-		    UINFO(9, "       Found " << found_one << " __en signals from of " << refs->size() << " possible drivers" << endl);
+-		    // not sure what I should do here other than error that they are mixing low-Z and tristate drivers.
+-		    // The other scenerio, and probably more likely, is that they are using a high-Z construct that
+-		    // is not supported.  Improving the high-Z detection logic will reduce the occurance of this failure.
+-		    v3error("Mixing tristate and low-Z drivers.  Perhaps you are using a high-Z construct not supported");
+-		} else  {
++//		if (found_one) {
++//		    UINFO(9, "       Problem mixing tristate and low-Z on " << lhsp << endl);
++//		    UINFO(9, "       Found " << found_one << " __en signals from of " << refs->size() << " possible drivers" << endl);
++//		    // not sure what I should do here other than error that they are mixing low-Z and tristate drivers.
++//		    // The other scenerio, and probably more likely, is that they are using a high-Z construct that
++//		    // is not supported.  Improving the high-Z detection logic will reduce the occurance of this failure.
++//		    v3error("Mixing tristate and low-Z drivers.  Perhaps you are using a high-Z construct not supported");
++//		} else  {
++                if(found_one==0) {
+ 		    UINFO(9, "       No tristates found on " << lhsp <<endl);
+ 		}
+ 		lhsmapp->erase(lhsp);
+@@ -377,6 +378,19 @@ private:
+ 
+ 		// create a new var for this assignment.
+ 		AstVar* enp = (AstVar*)refp->user1p();
++		if(!enp) {
++		  enp = new AstVar(lhsp->fileline(),
++				   AstVarType::MODULETEMP,
++				   lhsp->name()+"__en"+cvtToStr(m_unique),
++				   (w>1) ? new AstRange(nodep->fileline(), w-1, 0) : (AstRange *) NULL);
++		  V3Number ones(lhsp->fileline(), wfill, 0);
++		  ones.setAllBits1();
++		  nodep->addStmtp(enp);
++		  nodep->addStmtp(new AstAssignW(lhsp->fileline(),
++						 new AstVarRef(lhsp->fileline(), enp, true),
++						 new AstConst(lhsp->fileline(), ones)));
++
++		}
+ 		AstVar* newlhsp = new AstVar(lhsp->fileline(),
+ 					     AstVarType::MODULETEMP,
+ 					     lhsp->name()+"__lhs"+cvtToStr(m_unique++),
+@@ -649,17 +663,38 @@ private:
+ 	if (m_state == CONVERT_PINS) {
+ 	    if (nodep->modVarp()->user1p()) {
+ 		// create the input pin
+-		AstVarRef* refp = nodep->exprp()->castVarRef();
++  	        AstPin *pinp;
++	        AstVarRef *refp;
++		AstSel *selp = nodep->exprp()->castSel();
++		if(selp) {
++		  refp = selp->fromp()->castVarRef();
++		} else {
++		  refp = nodep->exprp()->castVarRef();
++		}
++		if(!refp) { 
++		  v3error("Unsupported inout type");
++		  return; 
++		}
+ 		AstVar* inp;
+ 		if (refp->varp()->user1p()) { // this is a tristate
+ 		    inp = (AstVar*) refp->varp()->user1p();
+ 		} else {
+ 		    inp = refp->varp();
+ 		}
+-		AstPin* pinp = new AstPin(nodep->fileline(),
+-					  nodep->pinNum(),
+-					  nodep->name() + "__in",
+-					  new AstVarRef(nodep->fileline(), inp, false));
++		AstNode* newnodep;
++		if(selp) {
++		  newnodep = new AstSel(selp->fileline(),
++					new AstVarRef(nodep->fileline(), inp, false),
++					selp->lsbp()->cloneTree(false),
++					selp->widthp()->cloneTree(false));
++		} else {
++		  newnodep = new AstVarRef(nodep->fileline(), inp, false);
++		}
++
++		pinp = new AstPin(nodep->fileline(),
++				  nodep->pinNum(),
++				  nodep->name() + "__in",
++				  newnodep);
+ 		m_cellp->addPinsp(pinp);
+ 
+ 		// now link it
