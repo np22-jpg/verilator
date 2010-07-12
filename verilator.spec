@@ -1,15 +1,14 @@
 Name:           verilator
-Version:        3.712
+Version:        3.803
 Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        GPLv2
-Group: 	        Applications/Engineering
+Group:          Applications/Engineering
 URL:            http://www.veripool.com/verilator.html
 Source0:        http://www.veripool.org/verilator/ftp/%{name}-%{version}.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  perl, flex, bison, perl-SystemPerl-devel
 Requires:       perl-SystemPerl-devel >= 1.320
-Patch0:         verilator-driver.patch
 
 %description
 
@@ -20,24 +19,17 @@ where fast simulation performance is of primary concern, and is
 especially well suited to create executable models of CPUs for
 embedded software design teams.
 
-Authors:
---------
-
-Wilson Snyder
-Paul Wasson
-Duane Galbi
-
 %prep
 %setup -q
-%patch0 -p1
+
 find . -name .gitignore -exec rm {} \;
 export VERILATOR_ROOT=%{_datadir}
-%{configure} --enable-envdef --prefix=%{_prefix} --mandir=%{_mandir} 
+%{configure} --enable-envdef --prefix=%{_prefix} --mandir=%{_mandir}
 %{__sed} -i "s|CPPFLAGSNOWALL +=|CPPFLAGSNOWALL +=%{optflags}|" \
 {src,test_c,test_regress,test_sc,test_sp,test_verilated}/Makefile_obj
 
 %build
-SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags} 
+SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 
 
 %install
@@ -53,7 +45,7 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 %{__rm} -rf %{buildroot}%{_bindir}/verilator_includer
 
 %clean
-%{__rm} -rf %{buildroot}  
+%{__rm} -rf %{buildroot}
 
 %files
 
@@ -73,6 +65,8 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 
 
 %changelog
+* Sun Jul 11 2010  Chitlesh Goorah <chitlesh [AT] fedoraproject DOT org> - 3.803-1
+- updated to 3.803
 
 * Fri Jul 24 2009 Lane Brooks <dirjud [AT] gmail DOT com> - 3.712-1
 - Updated to verilator 3.712
@@ -80,7 +74,7 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 * Fri Jun 26 2009 Lane Brooks <dirjud [AT] gmail DOT com> - 3.711-1
 - Updated to verilator 3.711
 - Added Artistic file
-- Fixed permissions on man file 
+- Fixed permissions on man file
 
 * Tue Jun 9 2009 Lane Brooks <dirjud [AT] gmail DOT com> - 3.710-1
 - Updated to verilator 3.710
