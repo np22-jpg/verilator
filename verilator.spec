@@ -1,6 +1,6 @@
 Name:           verilator
 Version:        3.804
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        GPLv2
 Group:          Applications/Engineering
@@ -65,6 +65,9 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 
 
 %changelog
+* Wed Sep 29 2010 jkeating - 3.804-2
+- Rebuilt for gcc bug 634757
+
 * Sat Sep 25 2010  Chitlesh Goorah <chitlesh [AT] fedoraproject DOT org> - 3.804-1
 - updated to 3.804
 
