@@ -1,11 +1,11 @@
 Name:           verilator
-Version:        3.805
-Release:        6%{?dist}
+Version:        3.845
+Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        GPLv2
 Group:          Applications/Engineering
 URL:            http://www.veripool.com/verilator.html
-Source0:        http://www.veripool.org/verilator/ftp/%{name}-%{version}.tgz
+Source0:        http://www.veripool.org/ftp/%{name}-%{version}.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  perl, flex, bison, perl-SystemPerl-devel
 Requires:       perl-SystemPerl-devel >= 1.320
@@ -65,6 +65,9 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 
 
 %changelog
+* Sat Feb 16 2013  Chitlesh Goorah <chitlesh [AT] fedoraproject DOT org> - 3.845-1
+- updated to 3.845
+
 * Fri Feb 15 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.805-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
