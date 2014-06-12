@@ -92,7 +92,7 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 * Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.805-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
-* Sat Nov 07 2010  Chitlesh Goorah <chitlesh [AT] fedoraproject DOT org> - 3.805-1
+* Sun Nov 07 2010  Chitlesh Goorah <chitlesh [AT] fedoraproject DOT org> - 3.805-1
 - updated to 3.805
 
 * Sat Sep 25 2010  Chitlesh Goorah <chitlesh [AT] fedoraproject DOT org> - 3.804-1
