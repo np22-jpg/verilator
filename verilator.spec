@@ -1,6 +1,6 @@
 Name:           verilator
-Version:        3.845
-Release:        3%{?dist}
+Version:        3.862
+Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        GPLv2
 Group:          Applications/Engineering
@@ -65,6 +65,9 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 
 
 %changelog
+* Fri Jun 13 2014 Scott Tsai <scottt.tw@gmail.com> 3.862-1
+- Upstream 3.862
+
 * Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.845-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
