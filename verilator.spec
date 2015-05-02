@@ -1,6 +1,6 @@
 Name:           verilator
 Version:        3.864
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        GPLv2
 Group:          Applications/Engineering
@@ -65,6 +65,9 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 
 
 %changelog
+* Sat May 02 2015 Kalev Lember <kalevlember@gmail.com> - 3.864-2
+- Rebuilt for GCC 5 C++11 ABI change
+
 * Mon Sep 22 2014 Scott Tsai <scottt.tw@gmail.com> 3.864-1
 - Upstream 3.864
 
