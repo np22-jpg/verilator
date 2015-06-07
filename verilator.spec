@@ -1,6 +1,6 @@
 Name:           verilator
-Version:        3.864
-Release:        2%{?dist}
+Version:        3.874
+Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        GPLv2
 Group:          Applications/Engineering
@@ -26,7 +26,7 @@ find . -name .gitignore -exec rm {} \;
 export VERILATOR_ROOT=%{_datadir}
 %{configure} --enable-envdef --prefix=%{_prefix} --mandir=%{_mandir}
 %{__sed} -i "s|CPPFLAGSNOWALL +=|CPPFLAGSNOWALL +=%{optflags}|" \
-{src,test_c,test_regress,test_sc,test_sp,test_verilated}/Makefile_obj
+{src,test_c,test_regress,test_sc,test_verilated}/Makefile_obj
 
 %build
 SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
@@ -44,6 +44,11 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 %{__rm} -rf %{buildroot}%{_datadir}/verilator/src
 %{__rm} -rf %{buildroot}%{_bindir}/verilator_includer
 
+# verilator installs verilator.pc under ${datadir}
+# but for consistency we want it under ${libdir}
+mkdir -p %{buildroot}%{_libdir}/pkgconfig
+mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconfig
+
 %clean
 %{__rm} -rf %{buildroot}
 
@@ -56,15 +61,24 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 %doc examples/
 
 %attr(644,-,-) %{_mandir}/man1/verilator.1.gz
+%{_mandir}/man1/verilator_coverage.1.gz
+%{_mandir}/man1/verilator_profcfunc.1.gz
+
 %{_datadir}/verilator
 
 %{_bindir}/verilator
 %{_bindir}/verilator_bin
 %{_bindir}/verilator_bin_dbg
 %{_bindir}/verilator_profcfunc
+%{_bindir}/verilator_coverage
+%{_bindir}/verilator_coverage_bin_dbg
 
+%{_libdir}/pkgconfig/verilator.pc
 
 %changelog
+* Sun Jun 07 2015 Scott Tsai <scottt.tw@gmail.com> - 3.874-1
+- Upstream 3.874
+
 * Sat May 02 2015 Kalev Lember <kalevlember@gmail.com> - 3.864-2
 - Rebuilt for GCC 5 C++11 ABI change
 
