@@ -7,7 +7,7 @@ Group:          Applications/Engineering
 URL:            http://www.veripool.com/verilator.html
 Source0:        http://www.veripool.org/ftp/%{name}-%{version}.tgz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  perl, flex, bison, perl-SystemPerl-devel
+BuildRequires:  perl, perl-generators, flex, bison, perl-SystemPerl-devel
 Requires:       perl-SystemPerl-devel >= 1.320
 
 %description
