@@ -1,12 +1,11 @@
 Name:           verilator
-Version:        3.874
-Release:        3%{?dist}
+Version:        3.890
+Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        GPLv2
 Group:          Applications/Engineering
 URL:            http://www.veripool.com/verilator.html
 Source0:        http://www.veripool.org/ftp/%{name}-%{version}.tgz
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  perl, perl-generators, flex, bison, perl-SystemPerl-devel
 Requires:       perl-SystemPerl-devel >= 1.320
 
@@ -33,7 +32,6 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 
 
 %install
-%{__rm} -rf %{buildroot}
 %{__make} DESTDIR=$RPM_BUILD_ROOT install
 
 # move the examples out of the datadir so that we can later include
@@ -49,12 +47,8 @@ SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
 mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconfig
 
-%clean
-%{__rm} -rf %{buildroot}
 
 %files
-
-%defattr(-, root, root, -)
 %doc README
 %doc COPYING Changes TODO Artistic
 %doc verilator.pdf verilator.html
@@ -76,6 +70,10 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_libdir}/pkgconfig/verilator.pc
 
 %changelog
+* Mon Nov 28 2016 Filipe Rosset <rosset.filipe@gmail.com> - 3.890-1
+- Rebuilt for new upstream version 3.890
+- Spec clean up plus fixes rhbz #1087393 and rhbz #1358609
+
 * Fri Feb 05 2016 Fedora Release Engineering <releng@fedoraproject.org> - 3.874-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
