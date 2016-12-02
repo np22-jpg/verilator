@@ -1,6 +1,6 @@
 Name:           verilator
 Version:        3.890
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        GPLv2
 Group:          Applications/Engineering
@@ -70,6 +70,9 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_libdir}/pkgconfig/verilator.pc
 
 %changelog
+* Mon Nov 28 2016 Filipe Rosset <rosset.filipe@gmail.com> - 3.890-2
+- Attempt to rebuilt on rawhide due dependency problems
+
 * Mon Nov 28 2016 Filipe Rosset <rosset.filipe@gmail.com> - 3.890-1
 - Rebuilt for new upstream version 3.890
 - Spec clean up plus fixes rhbz #1087393 and rhbz #1358609
