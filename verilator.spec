@@ -6,7 +6,7 @@ License:        GPLv2
 Group:          Applications/Engineering
 URL:            http://www.veripool.com/verilator.html
 Source0:        http://www.veripool.org/ftp/%{name}-%{version}.tgz
-BuildRequires:  perl, perl-generators, flex, bison, perl-SystemPerl-devel
+BuildRequires:  perl-interpreter, perl-generators, flex, bison, perl-SystemPerl-devel
 Requires:       perl-SystemPerl-devel >= 1.320
 
 %description
