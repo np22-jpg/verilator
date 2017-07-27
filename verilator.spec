@@ -1,6 +1,6 @@
 Name:           verilator
 Version:        3.890
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        GPLv2
 Group:          Applications/Engineering
@@ -70,6 +70,9 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_libdir}/pkgconfig/verilator.pc
 
 %changelog
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.890-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
 * Mon May 15 2017 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.890-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_27_Mass_Rebuild
 
