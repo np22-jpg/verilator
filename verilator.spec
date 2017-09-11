@@ -13,6 +13,11 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
+BuildRequires:  perl(Getopt::Long)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(Pod::Usage)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(vars)
 BuildRequires:  sed
 
 %description
