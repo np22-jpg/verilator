@@ -1,16 +1,21 @@
 Name:           verilator
-Version:        3.890
-Release:        6%{?dist}
+Version:        3.910
+Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
-License:        GPLv2
-Group:          Applications/Engineering
-URL:            http://www.veripool.com/verilator.html
+License:        LGPLv3 or Artistic 2.0
+URL:            http://www.veripool.com/%{name}.html
 Source0:        http://www.veripool.org/ftp/%{name}-%{version}.tgz
-BuildRequires:  perl-interpreter, perl-generators, flex, bison, perl-SystemPerl-devel
-Requires:       perl-SystemPerl-devel >= 1.320
+BuildRequires:  bison
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  flex
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  perl-generators
+BuildRequires:  perl-interpreter
+BuildRequires:  sed
 
 %description
-
 Verilator is the fastest free Verilog HDL simulator. It compiles
 synthesizable Verilog, plus some PSL, SystemVerilog and Synthesis
 assertions into C++ or SystemC code. It is designed for large projects
@@ -20,27 +25,35 @@ embedded software design teams.
 
 %prep
 %setup -q
-
-find . -name .gitignore -exec rm {} \;
+find . -name .gitignore -delete
 export VERILATOR_ROOT=%{_datadir}
-%{configure} --enable-envdef --prefix=%{_prefix} --mandir=%{_mandir}
-%{__sed} -i "s|CPPFLAGSNOWALL +=|CPPFLAGSNOWALL +=%{optflags}|" \
-{src,test_c,test_regress,test_sc,test_verilated}/Makefile_obj
+%{configure} \
+    --disable-ccwarn \
+    --enable-defenv \
+    --disable-longtests
+# We cannot run autoreconf because upstream uses unqualifed stdlib identifiers
+# that are included by autoconf-generated header files.
+find -name Makefile_obj -exec sed -i \
+    -e 's|^\(COPT = .*\)|\1 %{optflags}|' \
+    -e 's|^#LDFLAGS += .*|LDFLAGS += %{__global_ldflags}|' \
+    {} \;
 
 %build
-SYSTEMPERL_INCLUDE=%{_includedir}/perl-SystemPerl %{__make} %{?_smp_mflags}
+make %{?_smp_mflags}
 
+%check
+make test
 
 %install
-%{__make} DESTDIR=$RPM_BUILD_ROOT install
+make DESTDIR=$RPM_BUILD_ROOT install
 
 # move the examples out of the datadir so that we can later include
 # them in the doc dir
-%{__mv} %{buildroot}%{_datadir}/verilator/examples examples
+mv %{buildroot}%{_datadir}/verilator/examples examples
 
 # remove not needed build directory and bin directory
-%{__rm} -rf %{buildroot}%{_datadir}/verilator/src
-%{__rm} -rf %{buildroot}%{_bindir}/verilator_includer
+rm -rf %{buildroot}%{_datadir}/verilator/src
+rm -rf %{buildroot}%{_bindir}/verilator_includer
 
 # verilator installs verilator.pc under ${datadir}
 # but for consistency we want it under ${libdir}
@@ -49,12 +62,12 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 
 
 %files
-%doc README
-%doc COPYING Changes TODO Artistic
+%license Artistic COPYING*
+%doc Changes README TODO
 %doc verilator.pdf verilator.html
 %doc examples/
 
-%attr(644,-,-) %{_mandir}/man1/verilator.1.gz
+%{_mandir}/man1/verilator.1.gz
 %{_mandir}/man1/verilator_coverage.1.gz
 %{_mandir}/man1/verilator_profcfunc.1.gz
 
@@ -70,6 +83,10 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_libdir}/pkgconfig/verilator.pc
 
 %changelog
+* Fri Sep 08 2017 Petr Pisar <ppisar@redhat.com> - 3.910-1
+- 3.910 bump
+- License corrected to (LGPLv3 or Artistic 2.0)
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.890-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
