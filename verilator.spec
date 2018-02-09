@@ -1,6 +1,6 @@
 Name:           verilator
 Version:        3.920
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
 URL:            http://www.veripool.com/%{name}.html
@@ -91,6 +91,9 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_libdir}/pkgconfig/verilator.pc
 
 %changelog
+* Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.920-2
+- Escape macros in %%changelog
+
 * Wed Feb 07 2018 Filipe Rosset <rosset.filipe@gmail.com> - 3.920-1
 - 3.920 bump
 - Disabled tests until upstream fixes the issue
@@ -209,4 +212,4 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 - Added shared object generation patch
 
 * Thu Oct 16 2008 Lane Brooks <dirjud [AT] gmail DOT com> - 3.680-1
-- Initial package based on SUSE packages from Guenter Dannoritzer <dannoritzer{%}web{*}de>
+- Initial package based on SUSE packages from Guenter Dannoritzer <dannoritzer{%%}web{*}de>
