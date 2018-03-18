@@ -1,6 +1,6 @@
 Name:           verilator
-Version:        3.920
-Release:        2%{?dist}
+Version:        3.922
+Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
 URL:            http://www.veripool.com/%{name}.html
@@ -47,8 +47,8 @@ find -name Makefile_obj -exec sed -i \
 %build
 make %{?_smp_mflags}
 
-# disable tests until upstream fixes the issue
-# https://www.veripool.org/issues/1273
+# disable tests due lack of SystemC
+# Skip: vlt/t_a_first_sc: Test requires SystemC
 # %check
 # make test
 
@@ -91,6 +91,9 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_libdir}/pkgconfig/verilator.pc
 
 %changelog
+* Sun Mar 18 2018 Filipe Rosset <rosset.filipe@gmail.com> - 3.922-1
+- 3.922 bump, fixes rhbz #1557720
+
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 3.920-2
 - Escape macros in %%changelog
 
