@@ -1,6 +1,6 @@
 Name:           verilator
 Version:        3.922
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
 URL:            http://www.veripool.com/%{name}.html
@@ -55,9 +55,9 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=$RPM_BUILD_ROOT install
 
-# move the examples out of the datadir so that we can later include
-# them in the doc dir
-mv %{buildroot}%{_datadir}/verilator/examples examples
+# remove the copy of examples in the datadir so we could
+# mark the copy in the source directory as "doc"
+rm -rf %{buildroot}%{_datadir}/verilator/examples
 
 # remove not needed build directory and bin directory
 rm -rf %{buildroot}%{_datadir}/verilator/src
@@ -92,7 +92,11 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 
 
 %changelog
-* Mon Dec 10 2018 Marcus Müller <marcus@hostalia.de> - 3.922-4
+* Fri May 03 2019 Scott Tsai scottt.tw@gmail.com - 3.922-5
+- Remove duplicate copies of 'examples' in /usr/share/doc
+- https://bugzilla.redhat.com/show_bug.cgi?id=1592057#c3
+
+* Fri May 03 2019 Marcus Müller <marcus@hostalia.de> - 3.922-4
 - Made %{_bindir}/verilator et al executable, fixes rhbz #1592057
 
 * Sun Feb 03 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.922-3
