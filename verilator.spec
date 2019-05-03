@@ -1,6 +1,6 @@
 Name:           verilator
 Version:        3.922
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
 URL:            http://www.veripool.com/%{name}.html
@@ -80,7 +80,9 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_mandir}/man1/verilator_profcfunc.1.gz
 
 %{_datadir}/verilator
+%{_libdir}/pkgconfig/verilator.pc
 
+%defattr(755,root,root,-)
 %{_bindir}/verilator
 %{_bindir}/verilator_bin
 %{_bindir}/verilator_bin_dbg
@@ -88,9 +90,11 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_bindir}/verilator_coverage
 %{_bindir}/verilator_coverage_bin_dbg
 
-%{_libdir}/pkgconfig/verilator.pc
 
 %changelog
+* Mon Dec 10 2018 Marcus Müller <marcus@hostalia.de> - 3.922-4
+- Made %{_bindir}/verilator et al executable, fixes rhbz #1592057
+
 * Sun Feb 03 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.922-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
