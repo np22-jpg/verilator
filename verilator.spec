@@ -1,6 +1,6 @@
 Name:           verilator
 Version:        3.922
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
 URL:            http://www.veripool.com/%{name}.html
@@ -92,6 +92,9 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 
 
 %changelog
+* Sat Jul 27 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.922-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Fri May 03 2019 Scott Tsai scottt.tw@gmail.com - 3.922-5
 - Remove duplicate copies of 'examples' in /usr/share/doc
 - https://bugzilla.redhat.com/show_bug.cgi?id=1592057#c3
