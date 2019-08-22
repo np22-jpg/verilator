@@ -1,6 +1,6 @@
 Name:           verilator
-Version:        3.922
-Release:        6%{?dist}
+Version:        4.016
+Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
 URL:            http://www.veripool.com/%{name}.html
@@ -45,7 +45,7 @@ find -name Makefile_obj -exec sed -i \
     {} \;
 
 %build
-make %{?_smp_mflags}
+%make_build
 
 # disable tests due lack of SystemC
 # Skip: vlt/t_a_first_sc: Test requires SystemC
@@ -53,7 +53,7 @@ make %{?_smp_mflags}
 # make test
 
 %install
-make DESTDIR=$RPM_BUILD_ROOT install
+%make_install
 
 # remove the copy of examples in the datadir so we could
 # mark the copy in the source directory as "doc"
@@ -70,13 +70,14 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 
 
 %files
-%license Artistic COPYING*
-%doc Changes README TODO
+%license Artistic LICENSE
+%doc Changes README*
 %doc verilator.pdf verilator.html
 %doc examples/
 
 %{_mandir}/man1/verilator.1.gz
 %{_mandir}/man1/verilator_coverage.1.gz
+%{_mandir}/man1/verilator_gantt.1.gz
 %{_mandir}/man1/verilator_profcfunc.1.gz
 
 %{_datadir}/verilator
@@ -86,12 +87,16 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_bindir}/verilator
 %{_bindir}/verilator_bin
 %{_bindir}/verilator_bin_dbg
-%{_bindir}/verilator_profcfunc
 %{_bindir}/verilator_coverage
 %{_bindir}/verilator_coverage_bin_dbg
+%{_bindir}/verilator_gantt
+%{_bindir}/verilator_profcfunc
 
 
 %changelog
+* Thu Aug 22 2019 Filipe Rosset <rosset.filipe@gmail.com> - 4.016-1
+- Updated to 4.016 fixes rhbz#1590822 rhbz#1643479 and rhbz#1700228
+
 * Sat Jul 27 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.922-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
