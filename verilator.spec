@@ -1,5 +1,5 @@
 Name:           verilator
-Version:        4.016
+Version:        4.026
 Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
@@ -94,6 +94,9 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 
 
 %changelog
+* Wed Jan 22 2020 Filipe Rosset <rosset.filipe@gmail.com> - 4.026-1
+- Update to 4.026 fixes rhbz#1747211
+
 * Thu Aug 22 2019 Filipe Rosset <rosset.filipe@gmail.com> - 4.016-1
 - Updated to 4.016 fixes rhbz#1590822 rhbz#1643479 and rhbz#1700228
 
