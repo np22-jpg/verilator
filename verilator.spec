@@ -1,6 +1,6 @@
 Name:           verilator
 Version:        4.026
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
 URL:            http://www.veripool.com/%{name}.html
@@ -94,6 +94,9 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 
 
 %changelog
+* Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.026-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
 * Wed Jan 22 2020 Filipe Rosset <rosset.filipe@gmail.com> - 4.026-1
 - Update to 4.026 fixes rhbz#1747211
 
