@@ -5,6 +5,7 @@ Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
 URL:            http://www.veripool.com/%{name}.html
 Source0:        http://www.veripool.org/ftp/%{name}-%{version}.tgz
+BuildRequires: make
 BuildRequires:  bison
 BuildRequires:  coreutils
 BuildRequires:  findutils
