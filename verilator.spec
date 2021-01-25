@@ -1,17 +1,17 @@
 Name:           verilator
-Version:        4.032
-Release:        2%{?dist}
+Version:        4.108
+Release:        1%{?dist}
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
 URL:            http://www.veripool.com/%{name}.html
 Source0:        http://www.veripool.org/ftp/%{name}-%{version}.tgz
-BuildRequires: make
 BuildRequires:  bison
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
+Buildrequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(Data::Dumper)
@@ -20,6 +20,7 @@ BuildRequires:  perl(IO::File)
 BuildRequires:  perl(Pod::Usage)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
+BuildRequires:  python3-devel
 BuildRequires:  sed
 
 %description
@@ -95,6 +96,9 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 
 
 %changelog
+* Mon Jan 25 2021 Filipe Rosset <rosset.filipe@gmail.com> - 4.108-1
+- Update to 4.108 fixes rhbz#1901487
+
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 4.032-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
