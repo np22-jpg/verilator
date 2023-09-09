@@ -1,5 +1,5 @@
 Name:           verilator
-Version:        4.226
+Version:        5.014
 Release:        %autorelease
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPLv3 or Artistic 2.0
