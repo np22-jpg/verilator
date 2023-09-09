@@ -12,6 +12,7 @@ BuildRequires:  findutils
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
+BuildRequires:  help2man
 BuildRequires:  make
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
@@ -28,6 +29,9 @@ BuildRequires:  perl(Time::HiRes)
 BuildRequires:  perl(vars)
 BuildRequires:  python3-devel
 BuildRequires:  sed
+
+# required for further tests
+BuildRequires:  gdb
 
 %description
 Verilator is the fastest free Verilog HDL simulator. It compiles
