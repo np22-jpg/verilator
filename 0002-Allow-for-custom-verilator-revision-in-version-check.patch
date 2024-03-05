@@ -1,0 +1,35 @@
+commit 22cc6ef54328eb78ec98d3330ea7addc4a3805d6
+Author: Nolan Poe <npgo22@gmail.com>
+Date:   Fri Mar 8 16:46:50 2024 -0800
+
+    Allow for custom verilator revision for verilator --version
+
+diff --git a/docs/CONTRIBUTORS b/docs/CONTRIBUTORS
+index fa22f84fd..82e6160b6 100644
+--- a/docs/CONTRIBUTORS
++++ b/docs/CONTRIBUTORS
+@@ -136,6 +136,7 @@ Mostafa Gamal
+ Nandu Raj
+ Nathan Kohagen
+ Nathan Myers
++Nolan Poe
+ Oleh Maksymenko
+ Patrick Stewart
+ Paul Swirhun
+diff --git a/src/config_rev b/src/config_rev
+index 0640d85b1..8c0e0ecfd 100755
+--- a/src/config_rev
++++ b/src/config_rev
+@@ -22,7 +22,11 @@ Args = parser.parse_args()
+ 
+ os.chdir(Args.directory)
+ 
+-rev = 'UNKNOWN_REV'
++if 'VERILATOR_CUSTOM_REV' in os.environ:
++    rev = os.environ['VERILATOR_CUSTOM_REV']
++else:
++    rev = 'UNKNOWN_REV'
++
+ data = os.popen('git describe').read()
+ 
+ match = re.search(r'^(v[0-9].*)', data)

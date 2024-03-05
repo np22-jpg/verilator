@@ -1,37 +1,36 @@
 Name:           verilator
-Version:        5.020
+Version:        5.022
 Release:        %autorelease
 Summary:        A fast simulator for synthesizable Verilog
-License:        LGPLv3 or Artistic 2.0
+License:        LGPL-3.0-only OR Artistic-2.0
 URL:            https://veripool.org/verilator/
 Source0:        https://github.com/verilator/verilator/archive/refs/tags/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  bison
 BuildRequires:  coreutils
+BuildRequires:  cmake
 BuildRequires:  findutils
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  help2man
 BuildRequires:  make
+BuildRequires:  perl
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl-lib
-BuildRequires:  perl-version
-BuildRequires:  perl(Data::Dumper)
-BuildRequires:  perl(Digest::MD5)
-BuildRequires:  perl(FindBin)
-BuildRequires:  perl(Getopt::Long)
-BuildRequires:  perl(IO::File)
-BuildRequires:  perl(Pod::Usage)
-BuildRequires:  perl(strict)
-BuildRequires:  perl(Time::HiRes)
-BuildRequires:  perl(vars)
 BuildRequires:  python3-devel
 BuildRequires:  sed
 
+Requires:       perl
+
 # required for further tests
 BuildRequires:  gdb
+
+# Backported from upstream to fix building
+Patch0:  0001-fix-try-lock-spuriously-fails.patch
+
+# Sent upstream through GitHub
+Patch1:  0002-Allow-for-custom-verilator-revision-in-version-check.patch
 
 %description
 Verilator is the fastest free Verilog HDL simulator. It compiles
@@ -42,13 +41,13 @@ especially well suited to create executable models of CPUs for
 embedded software design teams.
 
 %prep
-%autosetup
+%autosetup -p1
+
 find . -name .gitignore -delete
 export VERILATOR_ROOT=%{_datadir}
 autoconf
 %{configure} \
     --disable-ccwarn \
-    --enable-defenv \
     --disable-longtests
 
 # We cannot run autoreconf because upstream uses unqualifed stdlib identifiers
@@ -59,10 +58,11 @@ find -name Makefile_obj -exec sed -i \
     {} \;
 
 %build
-%make_build
+export VERILATOR_CUSTOM_REV=fedora-%{version}
+%make_build 
 
 %check
-make test
+make test 
 
 %install
 %make_install
