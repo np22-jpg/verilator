@@ -37,6 +37,7 @@ BuildRequires:  gperftools-devel
 
 Requires:       perl-interpreter
 Requires:       gperftools-libs  
+Reqiores:       libstdc++
 
 # required for further tests
 BuildRequires:  gdb
@@ -47,8 +48,9 @@ Patch0: 0001-fix-try-lock-spuriously-fails.patch
 # Accepted upstream through GitHub, awaiting release
 Patch1: 0002-Allow-for-custom-verilator-revision-in-version-check.patch
 
-# Specific to fedora builds with fortified sources
-Patch2: 0003-enable-optimization-in-tests.patch
+# Still being drafted
+Patch2: 0003-Enable-optimization-in-tests.patch
+Patch3: 0004-Break-out-macros-to-fix-GCC14-compilation.patch
 
 %description
 Verilator is the fastest free Verilog HDL simulator. It compiles
