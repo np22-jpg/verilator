@@ -37,7 +37,7 @@ BuildRequires:  gperftools-devel
 
 Requires:       perl-interpreter
 Requires:       gperftools-libs  
-Reqiores:       libstdc++
+Requires:       libstdc++
 
 # required for further tests
 BuildRequires:  gdb
