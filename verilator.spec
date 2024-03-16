@@ -121,6 +121,10 @@ make test
 # mark the copy in the source directory as "doc"
 rm -rf %{buildroot}%{_datadir}/verilator/examples
 
+# move the test files to a global location
+mkdir -p %{buildroot}%{_datadir}/verilator/tests
+cp -r test_regress/t/ %{buildroot}%{_datadir}/verilator/tests
+
 # remove not needed build directory and bin directory
 rm -rf %{buildroot}%{_datadir}/verilator/src
 rm -rf %{buildroot}%{_bindir}/verilator_includer
@@ -129,7 +133,6 @@ rm -rf %{buildroot}%{_bindir}/verilator_includer
 # but for consistency we want it under ${libdir}
 mkdir -p %{buildroot}%{_libdir}/pkgconfig
 mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconfig
-
 
 %files
 %license Artistic LICENSE
@@ -148,7 +151,7 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_bindir}/verilator_profcfunc
 
 %files tests
-test_regress/t/*
+%{_datadir}/verilator/tests
 
 %changelog
 %autochangelog
