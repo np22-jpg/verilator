@@ -1,3 +1,7 @@
+%bcond tcmalloc 1
+%bcond ccache 1
+%bcond mold 1
+
 Name:           verilator
 Version:        5.022
 Release:        %autorelease
@@ -30,14 +34,30 @@ BuildRequires:  perl(Time::HiRes)
 BuildRequires:  perl(vars) 
 BuildRequires:  python3-devel
 BuildRequires:  sed
-
-# gperftools are required for tcmalloc
+%if %{with tcmalloc}
 BuildRequires:  gperftools-libs
 BuildRequires:  gperftools-devel
+%endif
+%if %{with mold}
+BuildRequires:  mold
+%endif
+%if %{with ccache}
+BuildRequires:  ccache
+%endif
 
+# Initial entrypoint needs perl
 Requires:       perl-interpreter
+
+# Optional deps
+%if %{with tcmalloc}
 Requires:       gperftools-libs  
-Requires:       libstdc++
+%endif
+%if %{with mold}
+Requires:       mold
+%endif
+%if %{with ccache}
+Requires:       ccache
+%endif
 
 # required for further tests
 BuildRequires:  gdb
@@ -49,7 +69,7 @@ Patch0: 0001-fix-try-lock-spuriously-fails.patch
 Patch1: 0002-Allow-for-custom-verilator-revision-in-version-check.patch
 
 # Undesirable upstream, fixes warnings with FORTIFY_SOURCE
-#Patch2: 0003-Enable-optimization-in-tests.patch
+Patch2: 0003-Enable-optimization-in-tests.patch
 
 # Accepted upstream through GitHub, awaiting release
 Patch3: 0004-Break-out-macros-to-fix-GCC14-compilation.patch
@@ -65,16 +85,15 @@ embedded software design teams.
 %prep
 %autosetup -p1
 autoconf
-
-export BUILD_FLAGS="--disable-longtests --disable-partial-static"
-
-%ifarch x86_64 amd64 aarch64
-    export BUILD_FLAGS+=" --enable-ccwarn"
+%configure \
+    --disable-longtests \
+    --disable-partial-static \
+%ifarch x86_64 aarch64
+    --enable-ccwarn \
 %else 
-    export BUILD_FLAGS+=" --disable-ccwarn"
+    --disable-ccwarn \
 %endif
 
-%configure ${BUILD_FLAGS}
 
 %build
 export VERILATOR_CUSTOM_REV=fedora-%{version}
