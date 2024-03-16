@@ -48,8 +48,10 @@ Patch0: 0001-fix-try-lock-spuriously-fails.patch
 # Accepted upstream through GitHub, awaiting release
 Patch1: 0002-Allow-for-custom-verilator-revision-in-version-check.patch
 
-# Still being drafted
-Patch2: 0003-Enable-optimization-in-tests.patch
+# Undesirable upstream, fixes warnings with FORTIFY_SOURCE
+#Patch2: 0003-Enable-optimization-in-tests.patch
+
+# Accepted upstream through GitHub, awaiting release
 Patch3: 0004-Break-out-macros-to-fix-GCC14-compilation.patch
 
 %description
@@ -63,11 +65,16 @@ embedded software design teams.
 %prep
 %autosetup -p1
 autoconf
-%configure \
-    --enable-ccwarn \
-    --disable-longtests \
-    --disable-partial-static \
-    --enable-tcmalloc
+
+export BUILD_FLAGS="--disable-longtests --disable-partial-static"
+
+%ifarch x86_64 amd64 aarch64
+    export BUILD_FLAGS+=" --enable-ccwarn"
+%else 
+    export BUILD_FLAGS+=" --disable-ccwarn"
+%endif
+
+%configure ${BUILD_FLAGS}
 
 %build
 export VERILATOR_CUSTOM_REV=fedora-%{version}

@@ -8,8 +8,8 @@ index 1e643ec83..7430a9c26 100755
                                  ($self->{verbose} ? "CPPFLAGS_DRIVER2=-DTEST_VERBOSE=1" : ""),
 -                                ($param{benchmark} ? "" : "OPT_FAST=-O0"),
 -                                ($param{benchmark} ? "" : "OPT_GLOBAL=-O0"),
-+                                ($param{benchmark} ? "" : "OPT_FAST=-Os"),
-+                                ($param{benchmark} ? "" : "OPT_GLOBAL=-Os"),
++                                ($param{benchmark} ? "" : "OPT_FAST=-O1"),
++                                ($param{benchmark} ? "" : "OPT_GLOBAL=-O1"),
                                  "$self->{vm_prefix}",  # bypass default rule, as we don't need archive
                                  ($param{make_flags} || ""),
                          ]);
