@@ -39,7 +39,9 @@ BuildRequires:  gperftools-libs
 BuildRequires:  gperftools-devel
 %endif
 %if %{with mold}
-BuildRequires:  mold
+%ifarch x86_64 aarch64
+Requires:       mold
+%endif
 %endif
 %if %{with ccache}
 BuildRequires:  ccache
