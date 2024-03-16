@@ -4,7 +4,7 @@
 
 Name:           verilator
 Version:        5.022
-Release:        %autorelease
+Release:        %autorelease -b 2
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPL-3.0-only OR Artistic-2.0
 URL:            https://veripool.org/verilator/
