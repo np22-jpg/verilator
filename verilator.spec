@@ -52,13 +52,16 @@ Requires:       perl-interpreter
 %if %{with tcmalloc}
 Requires:       gperftools-libs  
 %endif
-%if %{with mold}
-Requires:       mold
-%endif
 %if %{with ccache}
 Requires:       ccache
 %endif
 
+# currently fails on ppc64le/s390x
+%if %{with mold} 
+%ifarch x86_64 aarch64
+Requires:       mold
+%endif
+%endif
 # required for further tests
 BuildRequires:  gdb
 
@@ -96,7 +99,7 @@ autoconf
 
 
 %build
-export VERILATOR_CUSTOM_REV=fedora-%{version}
+export VERILATOR_CUSTOM_REV=fedora-%{autorelease}
 %make_build 
 
 %check
