@@ -4,7 +4,7 @@
 
 Name:           verilator
 Version:        5.022
-Release:        %autorelease -b 2
+Release:        %autorelease -b 3
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPL-3.0-only OR Artistic-2.0
 URL:            https://veripool.org/verilator/
@@ -87,6 +87,13 @@ where fast simulation performance is of primary concern, and is
 especially well suited to create executable models of CPUs for
 embedded software design teams.
 
+%package tests
+LICENSE: LGPL-3.0-only OR Artistic-2.0 OR CC0-1.0
+Summary: Tests for %{name}
+
+%description tests
+Open source tests for %{name}
+
 %prep
 %autosetup -p1
 autoconf
@@ -101,7 +108,7 @@ autoconf
 
 
 %build
-export VERILATOR_CUSTOM_REV=fedora-%{autorelease}
+export VERILATOR_CUSTOM_REV=fedora-%{version}
 %make_build 
 
 %check
@@ -140,6 +147,8 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_bindir}/verilator_gantt
 %{_bindir}/verilator_profcfunc
 
+%files tests
+test_regress/t/*
 
 %changelog
 %autochangelog
