@@ -4,7 +4,7 @@
 
 Name:           verilator
 Version:        5.022
-Release:        %autorelease -b 3
+Release:        %autorelease
 Summary:        A fast simulator for synthesizable Verilog
 License:        LGPL-3.0-only OR Artistic-2.0
 URL:            https://veripool.org/verilator/
@@ -58,11 +58,9 @@ Requires:       gperftools-libs
 Requires:       ccache
 %endif
 
-# currently fails on ppc64le/s390x
+# currently fails on ppc64le
 %if %{with mold} 
-%ifarch x86_64 aarch64
 Requires:       mold
-%endif
 %endif
 # required for further tests
 BuildRequires:  gdb
@@ -77,7 +75,7 @@ Patch1: 0002-Allow-for-custom-verilator-revision-in-version-check.patch
 Patch2: 0003-Enable-optimization-in-tests.patch
 
 # Accepted upstream through GitHub, awaiting release
-Patch3: 0004-Break-out-macros-to-fix-GCC14-compilation.patch
+Patch3: 0004-Fix-GCC14-warnings-on-template-specialization-syntax.patch
 
 %description
 Verilator is the fastest free Verilog HDL simulator. It compiles
@@ -87,28 +85,30 @@ where fast simulation performance is of primary concern, and is
 especially well suited to create executable models of CPUs for
 embedded software design teams.
 
-%package tests
-LICENSE: LGPL-3.0-only OR Artistic-2.0 OR CC0-1.0
-Summary: Tests for %{name}
-
-%description tests
-Open source tests for %{name}
-
 %prep
 %autosetup -p1
+find . -name .gitignore -delete
+export VERILATOR_ROOT=%{_datadir}
 autoconf
 %configure \
     --disable-longtests \
     --disable-partial-static \
+    --enable-defenv \
 %ifarch x86_64 aarch64
     --enable-ccwarn \
 %else 
     --disable-ccwarn \
 %endif
 
+# We cannot run autoreconf because upstream uses unqualifed stdlib identifiers
+# that are included by autoconf-generated header files.
+find -name Makefile_obj -exec sed -i \
+    -e 's|^\(COPT = .*\)|\1 %{optflags}|' \
+    -e 's|^#LDFLAGS += .*|LDFLAGS += %{__global_ldflags}|' \
+    {} \;
 
 %build
-export VERILATOR_CUSTOM_REV=fedora-%{version}
+export VERILATOR_SRC_VERSION=fedora-%{version}
 %make_build 
 
 %check
@@ -120,10 +120,6 @@ make test
 # remove the copy of examples in the datadir so we could
 # mark the copy in the source directory as "doc"
 rm -rf %{buildroot}%{_datadir}/verilator/examples
-
-# move the test files to a global location
-mkdir -p %{buildroot}%{_datadir}/verilator/tests
-cp -r test_regress/t/ %{buildroot}%{_datadir}/verilator/tests
 
 # remove not needed build directory and bin directory
 rm -rf %{buildroot}%{_datadir}/verilator/src
@@ -149,9 +145,6 @@ mv %{buildroot}%{_datadir}/pkgconfig/verilator.pc %{buildroot}%{_libdir}/pkgconf
 %{_bindir}/verilator_coverage_bin_dbg
 %{_bindir}/verilator_gantt
 %{_bindir}/verilator_profcfunc
-
-%files tests
-%{_datadir}/verilator/tests
 
 %changelog
 %autochangelog

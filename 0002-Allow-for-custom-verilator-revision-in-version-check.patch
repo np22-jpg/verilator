@@ -1,8 +1,8 @@
-commit 22cc6ef54328eb78ec98d3330ea7addc4a3805d6
+commit 04512e5d0484f26b75cf7386facceb929fbf2536
 Author: Nolan Poe <npgo22@gmail.com>
-Date:   Fri Mar 8 16:46:50 2024 -0800
+Date:   Sat Mar 9 13:44:25 2024 -0800
 
-    Allow for custom verilator revision for verilator --version
+    Add custom version for verilator --version packaging (#4954)
 
 diff --git a/docs/CONTRIBUTORS b/docs/CONTRIBUTORS
 index fa22f84fd..82e6160b6 100644
@@ -17,7 +17,7 @@ index fa22f84fd..82e6160b6 100644
  Patrick Stewart
  Paul Swirhun
 diff --git a/src/config_rev b/src/config_rev
-index 0640d85b1..8c0e0ecfd 100755
+index 0640d85b1..bbbcf9b3f 100755
 --- a/src/config_rev
 +++ b/src/config_rev
 @@ -22,7 +22,11 @@ Args = parser.parse_args()
@@ -25,8 +25,8 @@ index 0640d85b1..8c0e0ecfd 100755
  os.chdir(Args.directory)
  
 -rev = 'UNKNOWN_REV'
-+if 'VERILATOR_CUSTOM_REV' in os.environ:
-+    rev = os.environ['VERILATOR_CUSTOM_REV']
++if 'VERILATOR_SRC_VERSION' in os.environ:
++    rev = os.environ['VERILATOR_SRC_VERSION']
 +else:
 +    rev = 'UNKNOWN_REV'
 +
