@@ -587,14 +587,19 @@ endif()
 add_custom_target(
   clang-tidy-check
   clang-tidy
+  --fix-notes
+  --fix-errors
+  --format-style=file
+  --use-color
+  --export-fixes=${CMAKE_BINARY_DIR}/clang_tidy_fixes.log
   -p
   ${CMAKE_BINARY_DIR}/compile_commands.json
   --config-file
   ${CMAKE_SOURCE_DIR}/.clang-tidy
   ${COMMON_SOURCES}
-  --fix-errors
-  --fix-notes
-  --fix
-  DEPENDS ${VERILATOR})
+  USES_TERMINAL
+  DEPENDS ${VERILATOR}
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src
+  COMMENT "Running clang-tidy")
 
 install(TARGETS ${VERILATOR})
