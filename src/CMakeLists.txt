@@ -1,29 +1,32 @@
-#*****************************************************************************
+# *****************************************************************************
 #
 # DESCRIPTION: Script for build tool cmake on both unix and windows
 #
-#*****************************************************************************
+# *****************************************************************************
 #
-# Copyright 2003-2024 by Wilson Snyder. This program is free software; you
-# can redistribute it and/or modify it under the terms of either the GNU
-# Lesser General Public License Version 3 or the Perl Artistic License
-# Version 2.0.
+# Copyright 2003-2024 by Wilson Snyder. This program is free software; you can
+# redistribute it and/or modify it under the terms of either the GNU Lesser
+# General Public License Version 3 or the Perl Artistic License Version 2.0.
 # SPDX-License-Identifier: LGPL-3.0-only OR Artistic-2.0
 #
-#****************************************************************************/
+# ****************************************************************************/
 
 #
 # Utilities
-macro (addBuildType sourceConfig newConfig)
-    get_cmake_property(variableNames VARIABLES)
-    foreach (variableName ${variableNames})
-        if (variableName MATCHES "^CMAKE_.*_${sourceConfig}(|_.*)$")
-            string(REPLACE _${sourceConfig} _${newConfig} newVariableName ${variableName})
-            set(${newVariableName} ${${variableName}})
-            mark_as_advanced(${newVariableName})
-            message(DEBUG "   Propagating ${variableName} to ${newVariableName} = ${${newVariableName}}")
-        endif()
-    endforeach()
+macro(ADD_BUILD_TYPE sourceConfig newConfig)
+  get_cmake_property(variableNames VARIABLES)
+  foreach(variableName ${variableNames})
+    if(variableName MATCHES "^CMAKE_.*_${sourceConfig}(|_.*)$")
+      string(REPLACE _${sourceConfig} _${newConfig} newVariableName
+                     ${variableName})
+      set(${newVariableName} ${${variableName}})
+      mark_as_advanced(${newVariableName})
+      message(
+        DEBUG
+        "   Propagating ${variableName} to ${newVariableName} = ${${newVariableName}}"
+      )
+    endif()
+  endforeach()
 endmacro()
 
 #
@@ -181,8 +184,7 @@ set(HEADERS
     VlcPoint.h
     VlcSource.h
     VlcTest.h
-    VlcTop.h
-)
+    VlcTop.h)
 
 set(COMMON_SOURCES
     Verilator.cpp
@@ -323,210 +325,281 @@ set(COMMON_SOURCES
     V3ParseImp.cpp
     V3ParseGrammar.cpp
     V3ParseLex.cpp
-    V3PreProc.cpp
-)
+    V3PreProc.cpp)
 
-SET(COVERAGE_SOURCES
-    VlcMain.cpp
-)
+set(COVERAGE_SOURCES VlcMain.cpp)
 
-# Note about tests:
-# VlcMain.cpp #includes the following files:
-#  V3Error.cpp, V3String.cpp, V3Os.cpp and VlcTop.cpp
-# V3Number_test.cpp #includes the following files:
-#  V3FileLine.cpp
+# Note about tests: VlcMain.cpp #includes the following files: V3Error.cpp,
+# V3String.cpp, V3Os.cpp and VlcTop.cpp V3Number_test.cpp #includes the
+# following files: V3FileLine.cpp
 
 #
 # Generated sources and headers for the verilator binary
 
-set(srcdir ${CMAKE_CURRENT_SOURCE_DIR})
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-file(TO_NATIVE_PATH ${srcdir}/astgen ASTGEN)
-file(TO_NATIVE_PATH ${srcdir}/bisonpre BISONPRE)
-file(TO_NATIVE_PATH ${srcdir}/flexfix FLEXFIX)
-file(TO_NATIVE_PATH ${srcdir}/../bin/verilator_includer VERILATOR_INCLUDER)
-file(TO_NATIVE_PATH ${srcdir}/vlcovgen VLCOVGEN)
-file(TO_NATIVE_PATH ${srcdir}/config_rev CONFIG_REV)
+file(TO_NATIVE_PATH ${SRC_DIR}/astgen ASTGEN)
+file(TO_NATIVE_PATH ${SRC_DIR}/bisonpre BISONPRE)
+file(TO_NATIVE_PATH ${SRC_DIR}/flexfix FLEXFIX)
+file(TO_NATIVE_PATH ${SRC_DIR}/../bin/verilator_includer VERILATOR_INCLUDER)
+file(TO_NATIVE_PATH ${SRC_DIR}/vlcovgen VLCOVGEN)
+file(TO_NATIVE_PATH ${SRC_DIR}/config_rev CONFIG_REV)
 
 configure_file(config_package.h.in config_package.h @ONLY)
 
 add_custom_command(
-    OUTPUT V3Ast__gen_forward_class_decls.h V3Dfg__gen_forward_class_decls.h
-    DEPENDS ./V3Ast.h ${ASTGEN}
-    COMMAND ${PYTHON3} ARGS
-    ${ASTGEN} -I "${srcdir}" --astdef V3AstNodeDType.h --astdef V3AstNodeExpr.h --astdef V3AstNodeOther.h --dfgdef V3DfgVertices.h --classes
-)
-list(APPEND GENERATED_FILES V3Ast__gen_forward_class_decls.h V3Dfg__gen_forward_class_decls.h)
+  OUTPUT V3Ast__gen_forward_class_decls.h V3Dfg__gen_forward_class_decls.h
+  DEPENDS ./V3Ast.h ${ASTGEN}
+  COMMAND
+    ${PYTHON3} ARGS ${ASTGEN} -I "${SRC_DIR}" --astdef V3AstNodeDType.h --astdef
+    V3AstNodeExpr.h --astdef V3AstNodeOther.h --dfgdef V3DfgVertices.h
+    --classes
+  COMMENT "Generating forward class declarations for AST and DFG")
+list(APPEND GENERATED_FILES V3Ast__gen_forward_class_decls.h
+     V3Dfg__gen_forward_class_decls.h)
 # Output used directly by the `verilator` target
 
-set(verilog_y "${srcdir}/verilog.y" )
-set(BISON_V3ParseBison_OUTPUT_HEADER "${CMAKE_CURRENT_BINARY_DIR}/V3ParseBison.h")
-set(BISON_V3ParseBison_OUTPUT_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/V3ParseBison.c")
+set(VERILOG_Y "${SRC_DIR}/verilog.y")
+set(BISON_V3ParseBison_OUTPUT_HEADER
+    "${CMAKE_CURRENT_BINARY_DIR}/V3ParseBison.h")
+set(BISON_V3ParseBison_OUTPUT_SOURCE
+    "${CMAKE_CURRENT_BINARY_DIR}/V3ParseBison.c")
 add_custom_command(
-    OUTPUT V3ParseBison.c V3ParseBison.h
-    MAIN_DEPENDENCY ./verilog.y
-    DEPENDS ${BISONPRE}
-    COMMAND ${PYTHON3} ARGS
-        ${BISONPRE} --yacc "${BISON_EXECUTABLE}" -d -v
-            -o "${BISON_V3ParseBison_OUTPUT_SOURCE}" "${verilog_y}"
-)
+  OUTPUT V3ParseBison.c V3ParseBison.h
+  MAIN_DEPENDENCY ./verilog.y
+  DEPENDS ${BISONPRE}
+  COMMAND ${PYTHON3} ARGS ${BISONPRE} --yacc "${BISON_EXECUTABLE}" -d -v -o
+          "${BISON_V3ParseBison_OUTPUT_SOURCE}" "${VERILOG_Y}"
+  COMMENT "Generating parser from verilog.y")
 list(APPEND GENERATED_FILES V3ParseBison.c V3ParseBison.h)
 # Output used directly by the `verilator` target
 
-set(verilog_l "${srcdir}/verilog.l")
-set(FLEX_V3Lexer_pregen_OUTPUTS "${CMAKE_CURRENT_BINARY_DIR}/V3Lexer_pregen.yy.cpp")
+set(VERILOG_L "${SRC_DIR}/verilog.l")
+set(FLEX_V3Lexer_pregen_OUTPUTS
+    "${CMAKE_CURRENT_BINARY_DIR}/V3Lexer_pregen.yy.cpp")
 add_custom_command(
-    OUTPUT V3Lexer_pregen.yy.cpp
-    MAIN_DEPENDENCY ./verilog.l
-    DEPENDS ${BISON_V3ParseBison_OUTPUT_HEADER} ${HEADERS}
-    COMMAND ${FLEX_EXECUTABLE} ARGS
-        ${LFLAGS} -o "${FLEX_V3Lexer_pregen_OUTPUTS}" "${verilog_l}"
-)
+  OUTPUT V3Lexer_pregen.yy.cpp
+  MAIN_DEPENDENCY ./verilog.l
+  DEPENDS ${BISON_V3ParseBison_OUTPUT_HEADER} ${HEADERS}
+  COMMAND ${FLEX_EXECUTABLE} ARGS ${LFLAGS} -o "${FLEX_V3Lexer_pregen_OUTPUTS}"
+          "${VERILOG_L}"
+  COMMENT "Generating lexer from verilog.l")
 # Output used by another command
 
 set(FLEX_V3Lexer_OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/V3Lexer.yy.cpp)
 add_custom_command(
-    OUTPUT V3Lexer.yy.cpp
-    MAIN_DEPENDENCY ${FLEX_V3Lexer_pregen_OUTPUTS}
-    DEPENDS ${FLEXFIX}
-    COMMAND ${PYTHON3} ARGS
-        ${FLEXFIX} V3Lexer < "$<SHELL_PATH:${FLEX_V3Lexer_pregen_OUTPUTS}>" > "$<SHELL_PATH:${FLEX_V3Lexer_OUTPUTS}>"
-)
-add_custom_target(V3Lexer_yy_cpp${CMAKE_BUILD_TYPE} DEPENDS ${FLEX_V3Lexer_OUTPUTS})
+  OUTPUT V3Lexer.yy.cpp
+  MAIN_DEPENDENCY ${FLEX_V3Lexer_pregen_OUTPUTS}
+  DEPENDS ${FLEXFIX}
+  COMMAND
+    ${PYTHON3} ARGS ${FLEXFIX} V3Lexer <
+    "$<SHELL_PATH:${FLEX_V3Lexer_pregen_OUTPUTS}>" >
+    "$<SHELL_PATH:${FLEX_V3Lexer_OUTPUTS}>"
+    COMMENT "Generating V3Lexer output")
+add_custom_target(V3Lexer_yy_cpp${CMAKE_BUILD_TYPE}
+                  DEPENDS ${FLEX_V3Lexer_OUTPUTS}
+                  COMMENT "Generating V3Lexer")
 # Output included by another source file
 
-set(FLEX_V3PreLex_pregen_OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/V3PreLex_pregen.yy.cpp)
+set(FLEX_V3PreLex_pregen_OUTPUTS
+    ${CMAKE_CURRENT_BINARY_DIR}/V3PreLex_pregen.yy.cpp)
 add_custom_command(
-    OUTPUT V3PreLex_pregen.yy.cpp
-    MAIN_DEPENDENCY ./V3PreLex.l
-    DEPENDS ${HEADERS}
-    COMMAND ${FLEX_EXECUTABLE} ARGS
-        ${LFLAGS} -o "${FLEX_V3PreLex_pregen_OUTPUTS}" "${srcdir}/V3PreLex.l"
-)
+  OUTPUT V3PreLex_pregen.yy.cpp
+  MAIN_DEPENDENCY ./V3PreLex.l
+  DEPENDS ${HEADERS}
+  COMMAND ${FLEX_EXECUTABLE} ARGS ${LFLAGS} -o
+          "${FLEX_V3PreLex_pregen_OUTPUTS}" "${SRC_DIR}/V3PreLex.l"
+  COMMENT "Generating V3PreLex lexer")
 # Output used by another command
 
 set(FLEX_V3PreLex_OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/V3PreLex.yy.cpp)
 add_custom_command(
-    OUTPUT V3PreLex.yy.cpp
-    MAIN_DEPENDENCY ${FLEX_V3PreLex_pregen_OUTPUTS}
-    DEPENDS ${FLEXFIX}
-    COMMAND ${PYTHON3} ARGS
-        ${FLEXFIX} V3PreLex < "$<SHELL_PATH:${FLEX_V3PreLex_pregen_OUTPUTS}>" > "$<SHELL_PATH:${FLEX_V3PreLex_OUTPUTS}>"
-)
-add_custom_target(V3PreLex_yy_cpp${CMAKE_BUILD_TYPE} DEPENDS ${FLEX_V3PreLex_OUTPUTS})
+  OUTPUT V3PreLex.yy.cpp
+  MAIN_DEPENDENCY ${FLEX_V3PreLex_pregen_OUTPUTS}
+  DEPENDS ${FLEXFIX}
+  COMMAND
+    ${PYTHON3} ARGS ${FLEXFIX} V3PreLex <
+    "$<SHELL_PATH:${FLEX_V3PreLex_pregen_OUTPUTS}>" >
+    "$<SHELL_PATH:${FLEX_V3PreLex_OUTPUTS}>"
+    COMMENT "Generating V3PreLex output")
+add_custom_target(V3PreLex_yy_cpp${CMAKE_BUILD_TYPE}
+                  DEPENDS ${FLEX_V3PreLex_OUTPUTS}
+  COMMENT "Generating V3PreLex{CMAKE_BUILD_TYPE}")
 # Output included by another source file
 
-set(gitHead ${srcdir}/../.git/logs/HEAD)
-if (NOT EXISTS ${githead})
-    set(gitHead "")
+set(GIT_HEAD ${SRC_DIR}/../.git/logs/HEAD)
+if(NOT EXISTS ${githead})
+  set(GIT_HEAD "")
 endif()
 add_custom_command(
-    OUTPUT config_rev.h
-    MAIN_DEPENDENCY ${gitHead}
-    DEPENDS ${CONFIG_REV}
-    COMMAND ${PYTHON3} ARGS
-        ${CONFIG_REV} "${srcdir}" > "$<SHELL_PATH:${CMAKE_CURRENT_BINARY_DIR}/config_rev.h>"
-)
+  OUTPUT config_rev.h
+  MAIN_DEPENDENCY ${GIT_HEAD}
+  DEPENDS ${CONFIG_REV}
+  COMMAND ${PYTHON3} ARGS ${CONFIG_REV} "${SRC_DIR}" >
+          "$<SHELL_PATH:${CMAKE_CURRENT_BINARY_DIR}/config_rev.h>"
+  COMMENT "Generating config_rev.h")
 list(APPEND GENERATED_FILES config_rev.h)
 # Output used directly by the `verilator` target
 
-set(ASTGENERATED_NAMES
-    V3Const
-)
+set(ASTGENERATED_NAMES V3Const)
 
 foreach(astgen_name ${ASTGENERATED_NAMES})
-    add_custom_command(
-        OUTPUT ${astgen_name}__gen.cpp
-        MAIN_DEPENDENCY ${astgen_name}.cpp
-        DEPENDS ${ASTGEN} V3Ast.h
-        COMMAND ${PYTHON3} ARGS
-            ${ASTGEN} -I "${srcdir}" --astdef V3AstNodeDType.h --astdef V3AstNodeExpr.h --astdef V3AstNodeOther.h --dfgdef V3DfgVertices.h ${astgen_name}.cpp
-    )
-    list(APPEND GENERATED_FILES ${astgen_name}__gen.cpp)
+  add_custom_command(
+    OUTPUT ${astgen_name}__gen.cpp
+    MAIN_DEPENDENCY ${astgen_name}.cpp
+    DEPENDS ${ASTGEN} V3Ast.h
+    COMMAND
+      ${PYTHON3} ARGS ${ASTGEN} -I "${SRC_DIR}" --astdef V3AstNodeDType.h
+      --astdef V3AstNodeExpr.h --astdef V3AstNodeOther.h --dfgdef
+      V3DfgVertices.h ${astgen_name}.cpp
+    COMMENT "Generating ${astgen_name}__gen.cpp")
+  list(APPEND GENERATED_FILES ${astgen_name}__gen.cpp)
 endforeach()
 
 #
 # Set up the Coverage build type
 
-addBuildType(DEBUG COVERAGE)
+ADD_BUILD_TYPE(DEBUG COVERAGE)
 
-# This regenerates include/verilated_cov_key.h in the source tree.
-# It is a custom_target, not custom_command, because vlcovgen.d is
-# a phony target (it doesn't exist as a file).
+# This regenerates include/verilated_cov_key.h in the source tree. It is a
+# custom_target, not custom_command, because vlcovgen.d is a phony target (it
+# doesn't exist as a file).
 add_custom_target(
-    vlcovgen.d${CMAKE_BUILD_TYPE}
-    DEPENDS ../include/verilated_cov_key.h ${VLCOVGEN}
-    COMMENT "Updating include/verilated_cov_key.h"
-    COMMAND ${PYTHON3}
-        ${VLCOVGEN} --srcdir ${srcdir}
-)
+  vlcovgen.d${CMAKE_BUILD_TYPE}
+  DEPENDS ../include/verilated_cov_key.h ${VLCOVGEN}
+  COMMENT "Updating include/verilated_cov_key.h"
+  COMMAND ${PYTHON3} ${VLCOVGEN} --srcdir ${SRC_DIR})
 
 #
 # Set up the verilator binary target
 
-set(verilator verilator${CMAKE_BUILD_TYPE})
+set(VERILATOR VERILATOR${CMAKE_BUILD_TYPE})
 
-add_executable(${verilator}
-    $<$<NOT:$<CONFIG:COVERAGE>>:${COMMON_SOURCES}>
-    $<$<NOT:$<CONFIG:COVERAGE>>:${GENERATED_FILES}>
-    $<$<CONFIG:COVERAGE>:${COVERAGE_SOURCES} config_rev.h>
-)
+add_executable(
+  ${VERILATOR}
+  $<$<NOT:$<CONFIG:COVERAGE>>:${COMMON_SOURCES}>
+  $<$<NOT:$<CONFIG:COVERAGE>>:${GENERATED_FILES}>
+  $<$<CONFIG:COVERAGE>:${COVERAGE_SOURCES} config_rev.h>)
 
-set_target_properties(${verilator} PROPERTIES
-    OUTPUT_NAME_RELEASE   verilator_bin
-    OUTPUT_NAME_DEBUG     verilator_bin_dbg
-    OUTPUT_NAME_COVERAGE  verilator_coverage_bin_dbg
-    #UNITY_BUILD $<IF:$<CONFIG:DEBUG>,FALSE,${CMAKE_UNITY_BUILD}>
-    MSVC_RUNTIME_LIBRARY  MultiThreaded$<IF:$<CONFIG:Release>,,DebugDLL>
-    #JOB_POOL_LINK         one_job      # Linking takes lots of resources
-    INTERPROCEDURAL_OPTIMIZATION_RELEASE  $<IF:MINGW,FALSE,TRUE>
-)
+set_target_properties(
+  ${VERILATOR}
+  PROPERTIES OUTPUT_NAME_RELEASE verilator_bin
+             OUTPUT_NAME_DEBUG verilator_bin_dbg
+             OUTPUT_NAME_COVERAGE verilator_coverage_bin_dbg
+             # UNITY_BUILD $<IF:$<CONFIG:DEBUG>,FALSE,${CMAKE_UNITY_BUILD}>
+             MSVC_RUNTIME_LIBRARY MultiThreaded$<IF:$<CONFIG:Release>,,DebugDLL>
+             # JOB_POOL_LINK         one_job      # Linking takes lots of
+             # resources
+             INTERPROCEDURAL_OPTIMIZATION_RELEASE $<IF:MINGW,FALSE,TRUE>)
 
-add_dependencies(${verilator}
-    V3Lexer_yy_cpp${CMAKE_BUILD_TYPE}
-    V3PreLex_yy_cpp${CMAKE_BUILD_TYPE}
-)
+add_dependencies(${VERILATOR} V3Lexer_yy_cpp${CMAKE_BUILD_TYPE}
+                 V3PreLex_yy_cpp${CMAKE_BUILD_TYPE})
 
 # verilated_cov_key.h is only regenerated in a single-configuration environment.
 # This limitation can be lifted when `add_dependencies` will support generator
 # expressions. See https://gitlab.kitware.com/cmake/cmake/issues/19467
-if (CMAKE_BUILD_TYPE STREQUAL Coverage)
-    add_dependencies(${verilator} vlcovgen.d${CMAKE_BUILD_TYPE})
+if(CMAKE_BUILD_TYPE STREQUAL Coverage)
+  add_dependencies(${VERILATOR} vlcovgen.d${CMAKE_BUILD_TYPE})
 endif()
 
-if (NOT MSVC)
-    target_compile_features(${verilator} PRIVATE cxx_std_11)
+if(NOT MSVC)
+  target_compile_features(${VERILATOR} PRIVATE cxx_std_17)
 endif()
 
-target_compile_definitions(${verilator} PRIVATE
-    YYDEBUG # Required to get nice error messages
-    $<$<CONFIG:DEBUG>:VL_DEBUG>
-    $<$<CONFIG:DEBUG>:_GLIBCXX_DEBUG>
-)
+target_compile_definitions(
+  ${VERILATOR}
+  PRIVATE YYDEBUG # Required to get nice error messages
+          $<$<CONFIG:DEBUG>:VL_DEBUG> $<$<CONFIG:DEBUG>:_GLIBCXX_DEBUG>)
 
-target_include_directories(${verilator}
-    PRIVATE
-    ../include
-    ${WIN_FLEX_BISON}
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}/../include
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
+target_include_directories(
+  ${VERILATOR}
+  PRIVATE ../include ${WIN_FLEX_BISON} ${CMAKE_CURRENT_BINARY_DIR}
+          ${CMAKE_CURRENT_BINARY_DIR}/../include ${CMAKE_CURRENT_SOURCE_DIR})
 
-if (WIN32)
-    if(MINGW)
-        target_compile_options(${verilator} PRIVATE -Wa,-mbig-obj)
-        target_link_options(${verilator} PRIVATE -Wl,--stack,10000000 -mconsole -lcomctl32 -DWIN_32_LEAN_AND_MEAN)
-    else()
-        target_compile_options(${verilator} PRIVATE /bigobj)
-        target_link_options(${verilator} PRIVATE /STACK:10000000)
-    endif()
+if(WIN32)
+  if(MINGW)
+    target_compile_options(${VERILATOR} PRIVATE -Wa,-mbig-obj)
+    target_link_options(${VERILATOR} PRIVATE -Wl,--stack,10000000 -mconsole
+                        -lcomctl32 -DWIN_32_LEAN_AND_MEAN)
+  else()
+    target_compile_options(${VERILATOR} PRIVATE /bigobj)
+    target_link_options(${VERILATOR} PRIVATE /STACK:10000000)
+  endif()
 
-    target_compile_definitions(${verilator} PRIVATE
-        YY_NO_UNISTD_H
-    )
-    target_include_directories(${verilator} PRIVATE ../platform/win32)
-    target_link_libraries(${verilator} PRIVATE bcrypt psapi)
+  target_compile_definitions(${VERILATOR} PRIVATE YY_NO_UNISTD_H)
+  target_include_directories(${VERILATOR} PRIVATE ../platform/win32)
+  target_link_libraries(${VERILATOR} PRIVATE bcrypt psapi)
 endif()
 
-install(TARGETS ${verilator})
+if(ENABLE_CCWARN)
+  set_property(TARGET ${VERILATOR} PROPERTY COMPILE_WARNING_AS_ERROR ON)
+  if(NOT MSVC)
+    # set(EXTRA_WARNING_FLAGS "-Wextra -Wfloat-conversion -Wlogical-op")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_WARNING_FLAGS}")
+  endif()
+endif()
+
+if(ENABLE_LTO)
+  check_ipo_supported(RESULT lto_supported OUTPUT error)
+  if(lto_supported)
+    message(STATUS "LTO enabled")
+    set_property(TARGET ${VERILATOR} PROPERTY INTERPROCEDURAL_OPTIMIZATION ON)
+  else()
+    message(FATAL_ERROR "LTO not supported: <${error}>")
+  endif()
+endif()
+
+if (TCMALLOC_ENABLED AND JEMALLOC_ENABLED)
+  message(FATAL_ERROR "Both tcmalloc and jemalloc are enabled. Please enable only one of them.")
+endif()
+
+if (NOT MSVC AND (TCMALLOC_ENABLED OR JEMALLOC_ENABLED))
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
+  -fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free")
+endif()
+
+if(TCMALLOC_ENABLED)
+  target_link_libraries(${VERILATOR} ${TCMALLOC_LIBRARIES})
+  target_include_directories(${VERILATOR} PUBLIC ${TCMALLOC_INCLUDE_DIRS})
+  target_compile_options(${VERILATOR} PUBLIC ${TCMALLOC_CFLAGS_OTHER})
+  # set(COMMON_TCMALLOC_FLAGS "-fno-builtin-malloc \
+  # -fno-builtin-malloc \
+  # -fno-builtin-calloc \
+  # -fno-builtin-realloc \
+  # -fno-builtin-free")
+  # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_TCMALLOC_FLAGS}")
+
+  # if(TCMALLOC_INCLUDE_DIR STREQUAL "")
+  #   error("%Error: TCMALLOC not found")
+  # else()
+  #   message(STATUS "Found TCMALLOC: ${TCMALLOC_INCLUDE_DIR}")
+  # endif()
+  # if(FULL_STATIC)
+  #   # message(STATUS "Using static tcmalloc")
+  #   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
+  #     ${SHARED_TCMALLOC_FLAGS} -l:libtcmalloc_minimal.a")
+  # else()
+  #   # message(STATUS "Using tcmalloc")
+  #   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
+  #   ${SHARED_TCMALLOC_FLAGS} -ltcmalloc_minimal")
+  # endif()
+endif()
+
+if(JEMALLOC_ENABLED)
+  target_link_libraries(${VERILATOR} ${JEMALLOC_LIBRARIES})
+  target_include_directories(${VERILATOR} PUBLIC ${JEMALLOC_INCLUDE_DIRS})
+  target_compile_options(${VERILATOR} PUBLIC ${JEMALLOC_CFLAGS_OTHER})
+endif()
+
+if(NOT MSVC AND (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
+  set(SPECIALIZED_DEBUG_FLAGS
+      "-Og -ggdb3 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -pipe")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SPECIALIZED_DEBUG_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS
+      "${CMAKE_EXE_LINKER_FLAGS} ${SPECIALIZED_DEBUG_FLAGS}")
+endif()
+
+add_custom_target(clang-tidy-check clang-tidy -p ${CMAKE_BINARY_DIR}/compile_commands.json --config-file ${CMAKE_SOURCE_DIR}/.clang-tidy ${COMMON_SOURCES} ${HEADERS} DEPENDS ${VERILATOR})
+
+
+install(TARGETS ${VERILATOR})
