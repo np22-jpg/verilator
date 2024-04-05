@@ -352,8 +352,7 @@ add_custom_command(
   DEPENDS ./V3Ast.h ${ASTGEN}
   COMMAND
     ${PYTHON3} ARGS ${ASTGEN} -I "${SRC_DIR}" --astdef V3AstNodeDType.h --astdef
-    V3AstNodeExpr.h --astdef V3AstNodeOther.h --dfgdef V3DfgVertices.h
-    --classes
+    V3AstNodeExpr.h --astdef V3AstNodeOther.h --dfgdef V3DfgVertices.h --classes
   COMMENT "Generating forward class declarations for AST and DFG")
 list(APPEND GENERATED_FILES V3Ast__gen_forward_class_decls.h
      V3Dfg__gen_forward_class_decls.h)
@@ -395,10 +394,11 @@ add_custom_command(
     ${PYTHON3} ARGS ${FLEXFIX} V3Lexer <
     "$<SHELL_PATH:${FLEX_V3Lexer_pregen_OUTPUTS}>" >
     "$<SHELL_PATH:${FLEX_V3Lexer_OUTPUTS}>"
-    COMMENT "Generating V3Lexer output")
-add_custom_target(V3Lexer_yy_cpp${CMAKE_BUILD_TYPE}
-                  DEPENDS ${FLEX_V3Lexer_OUTPUTS}
-                  COMMENT "Generating V3Lexer")
+  COMMENT "Generating V3Lexer output")
+add_custom_target(
+  V3Lexer_yy_cpp${CMAKE_BUILD_TYPE}
+  DEPENDS ${FLEX_V3Lexer_OUTPUTS}
+  COMMENT "Generating V3Lexer")
 # Output included by another source file
 
 set(FLEX_V3PreLex_pregen_OUTPUTS
@@ -407,8 +407,8 @@ add_custom_command(
   OUTPUT V3PreLex_pregen.yy.cpp
   MAIN_DEPENDENCY ./V3PreLex.l
   DEPENDS ${HEADERS}
-  COMMAND ${FLEX_EXECUTABLE} ARGS ${LFLAGS} -o
-          "${FLEX_V3PreLex_pregen_OUTPUTS}" "${SRC_DIR}/V3PreLex.l"
+  COMMAND ${FLEX_EXECUTABLE} ARGS ${LFLAGS} -o "${FLEX_V3PreLex_pregen_OUTPUTS}"
+          "${SRC_DIR}/V3PreLex.l"
   COMMENT "Generating V3PreLex lexer")
 # Output used by another command
 
@@ -421,9 +421,10 @@ add_custom_command(
     ${PYTHON3} ARGS ${FLEXFIX} V3PreLex <
     "$<SHELL_PATH:${FLEX_V3PreLex_pregen_OUTPUTS}>" >
     "$<SHELL_PATH:${FLEX_V3PreLex_OUTPUTS}>"
-    COMMENT "Generating V3PreLex output")
-add_custom_target(V3PreLex_yy_cpp${CMAKE_BUILD_TYPE}
-                  DEPENDS ${FLEX_V3PreLex_OUTPUTS}
+  COMMENT "Generating V3PreLex output")
+add_custom_target(
+  V3PreLex_yy_cpp${CMAKE_BUILD_TYPE}
+  DEPENDS ${FLEX_V3PreLex_OUTPUTS}
   COMMENT "Generating V3PreLex{CMAKE_BUILD_TYPE}")
 # Output included by another source file
 
@@ -459,7 +460,7 @@ endforeach()
 #
 # Set up the Coverage build type
 
-ADD_BUILD_TYPE(DEBUG COVERAGE)
+add_build_type(DEBUG COVERAGE)
 
 # This regenerates include/verilated_cov_key.h in the source tree. It is a
 # custom_target, not custom_command, because vlcovgen.d is a phony target (it
@@ -549,40 +550,23 @@ if(ENABLE_LTO)
   endif()
 endif()
 
-if (TCMALLOC_ENABLED AND JEMALLOC_ENABLED)
-  message(FATAL_ERROR "Both tcmalloc and jemalloc are enabled. Please enable only one of them.")
+if(TCMALLOC_ENABLED AND JEMALLOC_ENABLED)
+  message(
+    FATAL_ERROR
+      "Both tcmalloc and jemalloc are enabled. Please enable only one of them.")
 endif()
 
-if (NOT MSVC AND (TCMALLOC_ENABLED OR JEMALLOC_ENABLED))
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
-  -fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free")
+if(NOT MSVC AND (TCMALLOC_ENABLED OR JEMALLOC_ENABLED))
+  set(CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} \
+  -fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free"
+  )
 endif()
 
 if(TCMALLOC_ENABLED)
   target_link_libraries(${VERILATOR} ${TCMALLOC_LIBRARIES})
   target_include_directories(${VERILATOR} PUBLIC ${TCMALLOC_INCLUDE_DIRS})
   target_compile_options(${VERILATOR} PUBLIC ${TCMALLOC_CFLAGS_OTHER})
-  # set(COMMON_TCMALLOC_FLAGS "-fno-builtin-malloc \
-  # -fno-builtin-malloc \
-  # -fno-builtin-calloc \
-  # -fno-builtin-realloc \
-  # -fno-builtin-free")
-  # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_TCMALLOC_FLAGS}")
-
-  # if(TCMALLOC_INCLUDE_DIR STREQUAL "")
-  #   error("%Error: TCMALLOC not found")
-  # else()
-  #   message(STATUS "Found TCMALLOC: ${TCMALLOC_INCLUDE_DIR}")
-  # endif()
-  # if(FULL_STATIC)
-  #   # message(STATUS "Using static tcmalloc")
-  #   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
-  #     ${SHARED_TCMALLOC_FLAGS} -l:libtcmalloc_minimal.a")
-  # else()
-  #   # message(STATUS "Using tcmalloc")
-  #   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
-  #   ${SHARED_TCMALLOC_FLAGS} -ltcmalloc_minimal")
-  # endif()
 endif()
 
 if(JEMALLOC_ENABLED)
@@ -591,7 +575,8 @@ if(JEMALLOC_ENABLED)
   target_compile_options(${VERILATOR} PUBLIC ${JEMALLOC_CFLAGS_OTHER})
 endif()
 
-if(NOT MSVC AND (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo"))
+if(NOT MSVC AND (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL
+                                                      "RelWithDebInfo"))
   set(SPECIALIZED_DEBUG_FLAGS
       "-Og -ggdb3 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -pipe")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SPECIALIZED_DEBUG_FLAGS}")
@@ -599,7 +584,17 @@ if(NOT MSVC AND (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL 
       "${CMAKE_EXE_LINKER_FLAGS} ${SPECIALIZED_DEBUG_FLAGS}")
 endif()
 
-add_custom_target(clang-tidy-check clang-tidy -p ${CMAKE_BINARY_DIR}/compile_commands.json --config-file ${CMAKE_SOURCE_DIR}/.clang-tidy ${COMMON_SOURCES} ${HEADERS} DEPENDS ${VERILATOR})
-
+add_custom_target(
+  clang-tidy-check
+  clang-tidy
+  -p
+  ${CMAKE_BINARY_DIR}/compile_commands.json
+  --config-file
+  ${CMAKE_SOURCE_DIR}/.clang-tidy
+  ${COMMON_SOURCES}
+  --fix-errors
+  --fix-notes
+  --fix
+  DEPENDS ${VERILATOR})
 
 install(TARGETS ${VERILATOR})

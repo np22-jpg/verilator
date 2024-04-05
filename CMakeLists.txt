@@ -19,6 +19,16 @@ project(Verilator
     LANGUAGES CXX
 )
 
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+find_package(PkgConfig REQUIRED)
+set(PYTHON3 Python3::Interpreter)
+set(CMAKE_INSTALL_DATADIR ${CMAKE_INSTALL_PREFIX})
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+include(CheckStructHasMember)
+include(ExternalProject)
+include(CheckIPOSupported)
+
 option(
   DEBUG_AND_RELEASE_AND_COVERAGE
   "Builds both the debug and release binaries, overriding CMAKE_BUILD_TYPE. \
@@ -30,15 +40,16 @@ option(ENABLE_LTO "Enable Link Time Optimization" OFF)
 
 option(GENERATE_COMPILE_COMMANDS "Generate compile_commands.json" ON)
 
-find_package(Python3 COMPONENTS Interpreter REQUIRED)
-find_package(PkgConfig REQUIRED)
-set(PYTHON3 Python3::Interpreter)
-set(CMAKE_INSTALL_DATADIR ${CMAKE_INSTALL_PREFIX})
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
-include(CheckStructHasMember)
-include(ExternalProject)
-include(CheckIPOSupported)
+pkg_check_modules(TCMALLOC libtcmalloc_minimal)
+option(TCMALLOC_ENABLED "Compile Verilator with tcmalloc" OFF)
+
+pkg_check_modules(JEMALLOC jemalloc)
+option(JEMALLOC_ENABLED "Compile Verilator with jemalloc" OFF)
+
+# pkg_check_modules(MIMALLOC mimalloc)
+# set(MIMALLOC
+#     ""
+#     CACHE STRING "Compile Verilator with mimalloc" OFF)
 
 if(NOT WIN32)
   message(WARNING "CMake support on Linux/OSX is experimental.")
@@ -116,24 +127,6 @@ if(MOLD_ENABLED)
     set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
   endif()
 endif()
-
-# find_path(
-#   TCMALLOC_INCLUDE_DIR
-#   NAMES gperftools/tcmalloc.h
-#   HINTS /usr/include /usr/include/google /usr/include/gperftools)
-pkg_check_modules(TCMALLOC libtcmalloc_minimal)
-# include_directories(${TCMALLOC_INCLUDE_DIRS})
-
-set(TCMALLOC
-    ""
-    CACHE STRING "Path for tcmalloc, auto-detected if empty")
-option(TCMALLOC_ENABLED "Compile Verilator with tcmalloc" OFF)
-
-pkg_check_modules(JEMALLOC jemalloc)
-set(JEMALLOC
-    ""
-    CACHE STRING "Path for jemalloc, auto-detected if empty")
-option(JEMALLOC_ENABLED "Compile Verilator with jemalloc" OFF)
 
 option(FULL_STATIC "Link Verilator completely statically")
 if(FULL_STATIC)
