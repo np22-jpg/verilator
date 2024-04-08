@@ -1,0 +1,9 @@
+format:
+  tab_size: 4
+  line_width: 100
+  dangle_parens: true
+  line_ending: "unix"
+  max_subgroups_hwraps: 2
+  max_pargs_hwrap: 4
+  dangle_align: child
+  autosort: true
